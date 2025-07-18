@@ -1,2 +1,24 @@
-streamlit
-plotly
+# Core web framework
+streamlit>=1.28.0
+
+# Data manipulation and analysis
+pandas>=2.0.0
+tabular>=0.9.0s
+
+# Visualization
+plotly>=5.15.0
+
+# LangChain core and community packages
+langchain>=0.1.0
+langchain-community>=0.0.20
+langchain-experimental>=0.0.50
+langchain-google-genai>=1.0.0
+
+# Environment management
+python-dotenv>=1.0.0
+
+# Standard library packages (included with Python, listed for reference)
+# os - built-in
+# io - built-in
+# sys - built-in
+# re - built-in
