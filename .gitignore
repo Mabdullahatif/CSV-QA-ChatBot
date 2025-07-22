@@ -1,3 +1,5 @@
 .env
-__pycache__
-/custom_css/__pycache__
+__pycache__/
+custom_css/__pycache__/
+custom_css/__pycache__/apply_custom_css.cpython-313.pyc
+custom_css/__pycache__/apply_custom_css.cpython-313.pyc
