@@ -10,14 +10,13 @@ import io
 from custom_css.apply_custom_css import apply_custom_css
 
 st.markdown(apply_custom_css(), unsafe_allow_html=True)
-st.title("Titanic Project")
+st.title("CSV Q/A ChatBot POC")
 
 SYSTEM_PROMPT = (
-    "You are a data assistant. If the user asks for a plot, chart, graph, or visualization, "
-    "respond ONLY with a Python code block (using Plotly Express as px or Plotly Graph Objects as go) that creates the plot, "
-    "and assign the figure to a variable named 'fig'. Do NOT use matplotlib or seaborn. "
-    "If the user asks a question that does NOT require a plot, respond with a concise English answer and do NOT return any code."
-    "The DataFrame is named 'df'."
+    """You are a data assistant. If the user asks for a plot, chart, graph, or visualization, respond ONLY with a Python code block (using plotly.express as px or plotly.graph_objects as go) that creates the plot, and assign the figure to a variable named 'fig'. Do NOT use matplotlib or seaborn.
+    Don't create any sample data or overwrite the existing DataFrame. The provided DataFrame is named 'df'.
+    If the user asks a question that does NOT require a plot, respond with a concise English answer and do NOT return any code.
+    If the user asks a question that is not related to the data, respond with a concise English answer to stay on the topic of the data."""
 )
 
 if 'df' not in st.session_state:
@@ -72,21 +71,33 @@ def execute_plotly_code(code, df):
 if prompt := st.chat_input("Ask a question about the data..."):
     if 'agent' in st.session_state:
         full_prompt = f"{SYSTEM_PROMPT}\n{prompt}"
-        response = st.session_state.agent.run(full_prompt)
-        st.session_state.messages.append({"role": "user", "content": prompt})
+        try:
+            response = st.session_state.agent.run(full_prompt)
+            st.session_state.messages.append({"role": "user", "content": prompt})
 
-        code_block = extract_plotly_code(response)
-        if code_block:
-            fig = execute_plotly_code(code_block, st.session_state.df)
-            if fig is not None:
-                st.session_state.messages.append({"role": "plot", "content": fig})
-        else:
-            st.session_state.messages.append({"role": "assistant", "content": str(response)})
+            code_block = extract_plotly_code(response)
+            if code_block:
+                fig = execute_plotly_code(code_block, st.session_state.df)
+                if fig is not None:
+                    st.session_state.messages.append({"role": "plot", "content": fig})
+            else:
+                st.session_state.messages.append({"role": "assistant", "content": str(response)})
+        except ValueError as e:
+            if 'output parsing error' in str(e).lower():
+                st.session_state.messages.append({
+                    "role": "assistant",
+                    "content": "Sorry, I couldn't understand the response from the language model. Please try rephrasing your question or ask something else."
+                })
+            else:
+                st.session_state.messages.append({
+                    "role": "assistant",
+                    "content": f"An error occurred: {e}"
+                })
     else:
         st.warning("Please upload a CSV file first.")
 
 # Display messages in order
-for msg in st.session_state.messages:
+for idx, msg in enumerate(st.session_state.messages):
     if msg["role"] == "user":
         st.markdown(f"""<div class="row user-message chat-bubble">
             <div style="margin-right: 10px; text-align: right;">{msg['content']}</div>
@@ -98,4 +109,4 @@ for msg in st.session_state.messages:
             <div style="margin-left: 10px;">{msg['content']}</div>
         </div>""", unsafe_allow_html=True)
     elif msg["role"] == "plot":
-        st.plotly_chart(msg["content"])
+        st.plotly_chart(msg["content"], key=f"plotly_{idx}")

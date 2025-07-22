@@ -1,5 +1,6 @@
 import os
 from langchain_community.llms import OpenAI
+#from langchain_openai import OpenAI
 from langchain_experimental.agents.agent_toolkits import create_pandas_dataframe_agent
 from langchain_google_genai import ChatGoogleGenerativeAI
 from dotenv import load_dotenv
@@ -14,12 +15,12 @@ def get_dynamic_agent(df, llm_type="openai", temperature=0):
         openai_api_key = os.getenv("OPENAI_API_KEY")
         if not openai_api_key:
             raise ValueError("OPENAI_API_KEY environment variable not set.")
-        llm = OpenAI(model="gpt-4o-mini", temperature=temperature)
+        llm = OpenAI(model="gpt-4o-mini", temperature=temperature, api_key=openai_api_key)
     elif llm_type == "gemini":
         google_api_key = os.getenv("GOOGLE_API_KEY")
         if not google_api_key:
-            raise ValueError("GOOGLE_API_KEY environment variable not set.")
-        llm = ChatGoogleGenerativeAI(model="gemini-2.0-flash", temperature=temperature)
+            raise ValueError("GOOGLE_API_KEY envir  onment variable not set.")
+        llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash", temperature=temperature, api_key=google_api_key)
     else:
         raise ValueError("Unsupported LLM type. Choose 'openai' or 'gemini'.")
 
