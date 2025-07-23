@@ -1,48 +1,58 @@
 def apply_custom_css():
-    css ="""<style>
-        .chat-bubble {
-            padding: 10px 15px;
-            border-radius: 15px;
-            margin: 8px 0;
-            max-width: 80%;
-            word-wrap: break-word;
-            word-break: break-word;
-            overflow-wrap: break-word;
-            display: flex;
-            align-items: flex-start;
-            flex-wrap: wrap;
-            line-height: 1.5;
-        }
-
-        .user-message {
-            background-color: #2b6cb0;
-            color: white;
-            margin-left: auto;
-            justify-content: flex-end;
-            display: flex;
-            align-items: center;
-        }
-
-        .assistant-message {
-            background-color: #e2e8f0;
-            color: black;
-            margin-right: auto;
-            justify-content: flex-start;
-            display: flex;
-            align-items: center;
-        }
-
-        .avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            margin: 0 10px;
-        }
-
-        .row {
-            display: flex;
-            align-items: flex-start;
-            flex-wrap: nowrap;
-        }
-        </style>"""
+    css ="""
+        <style>
+            .main-header {
+                font-size: 2.5rem;
+                font-weight: 700;
+                margin-bottom: 1rem;
+            }
+            .chat-message {
+                padding: 1rem;
+                border-radius: 0.5rem;
+                margin-bottom: 1rem;
+                display: flex;
+                align-items: flex-start;
+            }
+            .user-message {
+                background-color: #10b981;
+                color: white;
+            }
+            .bot-message {
+                background-color: #1e1e1e;
+                border: 1px solid #333;
+                color: white;
+            }
+            .message-content {
+                margin-left: 1rem;
+            }
+            .block-container {
+                padding-top: 2rem;
+            }
+            .stFileUploader {
+                padding: 2rem;
+                border: 2px dashed #10b981;
+                border-radius: 0.5rem;
+            }
+            .stTabs [data-baseweb="tab-list"] {
+                gap: 1rem;
+            }
+            .stTabs [data-baseweb="tab"] {
+                height: 3rem;
+                white-space: pre-wrap;
+                background-color: #1e1e1e;
+                border-radius: 0.5rem;
+            }
+            .stTabs [aria-selected="true"] {
+                background-color: #10b981 !important;
+                color: white !important;
+            }
+            .card {
+                border-radius: 0.5rem;
+                padding: 1.5rem;
+                margin-bottom: 1rem;
+                background-color: #1e1e1e;
+                border: 1px solid #333;
+            }
+        </style>
+        """
     return css
