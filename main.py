@@ -1,112 +1,62 @@
 import streamlit as st
 import pandas as pd
 from io import StringIO
-from agents import get_dynamic_agent
+from agents_handler.agents import get_dynamic_agent
 import plotly.graph_objects as go
 import plotly.express as px
 import re
 import sys
 import io
 from custom_css.apply_custom_css import apply_custom_css
+import os
+import time
+from dotenv import load_dotenv
+from ui_components.sidebar import sidebar
+from ui_components.file_loader import file_uploader_card
+from ui_components.extras import show_feature_cards
+from ui_components.header import show_header
+from ui_components.file_upload import handle_file_upload
+from ui_components.data_preview import render_data_preview_tab
+from ui_components.chat_analysis import render_chat_analysis_tab
 
+load_dotenv()
+# --- Get API keys from environment variables ---
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
+GEMINI_API_KEY = os.getenv("GOOGLE_API_KEY", "")
+GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
+
+# --- Apply custom CSS ---
 st.markdown(apply_custom_css(), unsafe_allow_html=True)
-st.title("CSV Q/A ChatBot POC")
 
-SYSTEM_PROMPT = (
-    """You are a data assistant. If the user asks for a plot, chart, graph, or visualization, respond ONLY with a Python code block (using plotly.express as px or plotly.graph_objects as go) that creates the plot, and assign the figure to a variable named 'fig'. Do NOT use matplotlib or seaborn.
-    Don't create any sample data or overwrite the existing DataFrame. The provided DataFrame is named 'df'.
-    If the user asks a question that does NOT require a plot, respond with a concise English answer and do NOT return any code.
-    If the user asks a question that is not related to the data, respond with a concise English answer to stay on the topic of the data."""
-)
-
+# --- Session State ---
 if 'df' not in st.session_state:
     st.session_state.df = pd.DataFrame()
 if 'messages' not in st.session_state:
     st.session_state.messages = []
+if 'filename' not in st.session_state:
+    st.session_state.filename = None
+if 'agent' not in st.session_state:
+    st.session_state.agent = None
+if 'llm_type' not in st.session_state:
+    st.session_state.llm_type = "gemini"
 
-uploaded_file = st.file_uploader("Upload your csv file", type=["csv"])
-llm_type = st.sidebar.selectbox(
-    "Choose LLM",
-    options=["gemini", "openai"],
-    index=0,
-    help="Select which LLM to use for Q&A and visualization."
-)
 
-if uploaded_file is not None:
-    stringio = StringIO(uploaded_file.getvalue().decode("utf-8"))
-    st.session_state.df = pd.read_csv(stringio)
-    st.success("File uploaded and DataFrame loaded!")
-    st.session_state.agent = get_dynamic_agent(st.session_state.df, llm_type=llm_type)
+# --- Sidebar ---
+sidebar()
 
-if not st.session_state.df.empty:
-    st.subheader(f"Uploaded DataFrame: {uploaded_file.name if uploaded_file else 'DataFrame'}")
-    st.dataframe(st.session_state.df)
+# --- Main Header ---
+show_header()
 
-def extract_plotly_code(response):
-    """Extracts a plotly code block from the LLM response, if present."""
-    match = re.search(r"```python(.*?)```", str(response), re.DOTALL)
-    if match:
-        code = match.group(1)
-        # Remove any .show() calls
-        code = re.sub(r'\\.show\\s*\\(\\s*\\)', '', code)
-        return code.strip()
-    return None
-
-def execute_plotly_code(code, df):
-    """Executes plotly code in a restricted namespace and returns the figure."""
-    local_vars = {'df': df, 'go': go, 'px': px}
-    global_vars = {}
-    fig = None
-    old_stdout = sys.stdout
-    sys.stdout = mystdout = io.StringIO()
-    try:
-        exec(code, global_vars, local_vars)
-        fig = local_vars.get('fig', None)
-    except Exception as e:
-        st.error(f"Error executing visualization code: {e}")
-    finally:
-        sys.stdout = old_stdout
-    return fig
-
-if prompt := st.chat_input("Ask a question about the data..."):
-    if 'agent' in st.session_state:
-        full_prompt = f"{SYSTEM_PROMPT}\n{prompt}"
-        try:
-            response = st.session_state.agent.run(full_prompt)
-            st.session_state.messages.append({"role": "user", "content": prompt})
-
-            code_block = extract_plotly_code(response)
-            if code_block:
-                fig = execute_plotly_code(code_block, st.session_state.df)
-                if fig is not None:
-                    st.session_state.messages.append({"role": "plot", "content": fig})
-            else:
-                st.session_state.messages.append({"role": "assistant", "content": str(response)})
-        except ValueError as e:
-            if 'output parsing error' in str(e).lower():
-                st.session_state.messages.append({
-                    "role": "assistant",
-                    "content": "Sorry, I couldn't understand the response from the language model. Please try rephrasing your question or ask something else."
-                })
-            else:
-                st.session_state.messages.append({
-                    "role": "assistant",
-                    "content": f"An error occurred: {e}"
-                })
-    else:
-        st.warning("Please upload a CSV file first.")
-
-# Display messages in order
-for idx, msg in enumerate(st.session_state.messages):
-    if msg["role"] == "user":
-        st.markdown(f"""<div class="row user-message chat-bubble">
-            <div style="margin-right: 10px; text-align: right;">{msg['content']}</div>
-            <img src="https://cdn-icons-png.flaticon.com/512/149/149072.png" class="avatar" />
-        </div>""", unsafe_allow_html=True)
-    elif msg["role"] == "assistant":
-        st.markdown(f"""<div class="row assistant-message chat-bubble">
-            <img src="https://cdn-icons-png.flaticon.com/512/149/149074.png" class="avatar" />
-            <div style="margin-left: 10px;">{msg['content']}</div>
-        </div>""", unsafe_allow_html=True)
-    elif msg["role"] == "plot":
-        st.plotly_chart(msg["content"], key=f"plotly_{idx}")
+# --- Main Content ---
+if st.session_state.df.empty:
+    st.markdown('<div class="card">', unsafe_allow_html=True)
+    st.subheader("Upload CSV File")
+    if handle_file_upload(file_uploader_card):
+        pass  # rerun is handled inside handle_file_upload
+    show_feature_cards()
+else:
+    tabs = st.tabs(["Data Preview", "Chat Analysis"])
+    with tabs[0]:
+        render_data_preview_tab(st.session_state.df, st.session_state.filename)
+    with tabs[1]:
+        render_chat_analysis_tab(st.session_state.messages, st.session_state.agent, st.session_state.df)
