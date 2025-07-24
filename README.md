@@ -179,11 +179,6 @@ UI (Answer/Plot)
 3. Ensure code is well-documented and tested.
 4. Submit a pull request describing your changes.
 
----
-
-## License
-
-MIT License (add LICENSE file if not present)
 
 ---
 
