@@ -42,7 +42,7 @@ TITANIC_PROJECT/
 - Orchestrates the flow between UI components and backend logic.
 
 ### agents_handler/
-- **agents.py**: Contains `get_dynamic_agent`, which dynamically creates a LangChain agent for a given DataFrame using the selected LLM (OpenAI, Gemini, or Groq). Handles API key management and agent instantiation.
+- **agents.py**: Contains `get_dynamic_agent`, which dynamically creates a LangChain agent for a given DataFrame using the selected LLM (OpenAI, Gemini, or Groq). Handles API key management and agent instantiation, now supporting user-supplied keys from the sidebar.
 - **__init__.py**: (empty, for package recognition)
 
 ### custom_css/
@@ -54,22 +54,37 @@ TITANIC_PROJECT/
 - **data_preview.py**: Renders a tab for previewing the uploaded data and column statistics (types, unique values, missing values).
 - **extras.py**: Displays feature cards highlighting the app's capabilities (natural language queries, AI-powered analysis, data visualization).
 - **file_loader.py**: Provides the file uploader UI component for CSV files.
-- **file_upload.py**: Handles file upload logic, reads CSVs into DataFrames, updates session state, and initializes the LLM agent.
+- **file_upload.py**: Handles file upload logic, reads CSVs into DataFrames, updates session state, and initializes the LLM agent. The uploader is now disabled until a valid API key is entered for the selected provider.
 - **header.py**: Renders the main app header and description.
-- **sidebar.py**: Implements the sidebar UI, allowing LLM provider selection, session info, dataset KPIs, and data clearing.
+- **sidebar.py**: Implements the sidebar UI, allowing LLM provider selection, session info, dataset KPIs, and data clearing. Now includes advanced API key management and onboarding features (see below).
 - **__init__.py**: (empty)
+
+---
+
+## API Key Management & User Experience
+
+- **API Key Required**: Users must enter their own API key for the selected LLM provider (OpenAI, Gemini, or Groq) in the sidebar if no environment variable is set. The app will not allow data upload or chat until a valid key is provided.
+- **Sidebar Enhancements**:
+  - Status icon (success/warning) next to the API key input for the selected provider.
+  - Masked display of the API key after entry, with a "Change" button to edit and a "Done Editing" button to confirm.
+  - Provider-specific help links for obtaining an API key.
+  - Info box on first load about API key privacy and usage.
+  - "Reset Session" button to clear all data and API keys from the session.
+- **File Upload Disabled**: The file uploader is disabled and a warning is shown until a valid API key is entered for the selected provider.
+- **Privacy**: API keys are only stored in your browser session and are never sent to any server except the LLM provider. They are not persisted or shared.
 
 ---
 
 ## How It Works
 
-1. **User uploads a CSV file** via the sidebar or main area.
-2. The file is read into a pandas DataFrame, and a LangChain agent is created for the data using the selected LLM provider.
-3. The user can preview the data and column info in the "Data Preview" tab.
-4. In the "Chat Analysis" tab, the user can ask questions or request visualizations in natural language.
-5. The agent processes the prompt, analyzes the DataFrame, and returns either a textual answer or Python code for a Plotly chart.
-6. If code is returned, it is executed in a sandboxed environment and the resulting chart is displayed.
-7. All chat history and state are managed in Streamlit's session state.
+1. **User selects an LLM provider** in the sidebar and enters their API key (if not set in environment variables).
+2. The file uploader is enabled once a valid key is present.
+3. The user uploads a CSV file, which is read into a pandas DataFrame, and a LangChain agent is created for the data using the selected LLM provider and API key.
+4. The user can preview the data and column info in the "Data Preview" tab.
+5. In the "Chat Analysis" tab, the user can ask questions or request visualizations in natural language.
+6. The agent processes the prompt, analyzes the DataFrame, and returns either a textual answer or Python code for a Plotly chart.
+7. If code is returned, it is executed in a sandboxed environment and the resulting chart is displayed.
+8. All chat history and state are managed in Streamlit's session state.
 
 ---
 
@@ -86,7 +101,7 @@ TITANIC_PROJECT/
   ```bash
   pip install -r requirements.txt
   ```
-- Set up your `.env` file with the following keys:
+- Set up your `.env` file with the following keys (optional, for default API key):
   ```env
   OPENAI_API_KEY=your_openai_key
   GOOGLE_API_KEY=your_gemini_key
@@ -99,33 +114,35 @@ streamlit run main.py
 ```
 
 ### 3. **Using the App**
+- Select your preferred LLM provider in the sidebar.
+- Enter your API key for the selected provider (if not set in environment variables). The sidebar will show a status icon and mask your key for privacy.
+- The file uploader will be enabled once a valid key is present.
 - Upload a CSV file.
 - Explore your data in the "Data Preview" tab.
 - Switch to "Chat Analysis" to ask questions or request visualizations.
-- Select your preferred LLM provider in the sidebar.
-- Clear data or view session info as needed.
+- Use the "Reset Session" button in the sidebar to clear all data and API keys if needed.
 
 ---
 
 ## Features
-- **CSV File Upload**: Upload and analyze any CSV file.
+- **CSV File Upload**: Upload and analyze any CSV file (enabled only after API key entry).
 - **Interactive Chat**: Ask questions in natural language about your data.
 - **Multi-LLM Support**: Choose between OpenAI, Gemini, or Groq for analysis.
 - **Data Visualization**: Generate interactive Plotly charts from chat prompts.
 - **Custom Styling**: Modern, user-friendly interface.
 - **Robust Error Handling**: Handles missing keys, file errors, and code execution issues.
+- **Advanced API Key Management**: Secure, user-friendly onboarding and privacy for API keys.
 
 ---
 
-## Requirements
+## API Key Privacy & Troubleshooting
 
-- `streamlit`: Web app framework
-- `pandas`: Data manipulation
-- `tabular`: Tabular data utilities
-- `plotly`: Interactive visualizations
-- `openai`: OpenAI API client
-- `langchain`, `langchain-community`, `langchain-experimental`, `langchain-google-genai`, `langchain-groq`: LLM orchestration
-- `python-dotenv`: Environment variable management
+- **Privacy**: Your API key is only used in your browser session and never sent to any server except the LLM provider. It is not stored or shared.
+- **Troubleshooting**: If you see a warning about a missing or invalid API key, enter a valid key for the selected provider in the sidebar. The file uploader will remain disabled until a valid key is present.
+- **Provider Links**:
+  - [OpenAI API Keys](https://platform.openai.com/account/api-keys)
+  - [Google Gemini API Keys](https://aistudio.google.com/app/apikey)
+  - [Groq API Keys](https://console.groq.com/keys)
 
 ---
 
@@ -164,6 +181,11 @@ UI (Answer/Plot)
 
 ---
 
+## License
+
+MIT License (add LICENSE file if not present)
+
+---
 
 ## Acknowledgements
 - [Streamlit](https://streamlit.io/)
@@ -172,7 +194,6 @@ UI (Answer/Plot)
 - [Google Gemini](https://ai.google/discover/gemini/)
 - [Groq](https://groq.com/)
 - [Plotly](https://plotly.com/)
-
 
 ---
 
