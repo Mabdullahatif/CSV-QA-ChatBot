@@ -94,7 +94,7 @@ TITANIC_PROJECT/
 - Install Python 3.10+ (recommended).
 - Clone the repository:
   ```bash
-  git clone <repo-url>
+  git clone https://github.com/Mabdullahatif/CSV-QA-ChatBot.git
   cd CSV-QA-ChatBot
   ```
 - Install dependencies:
