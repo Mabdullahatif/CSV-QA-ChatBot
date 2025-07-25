@@ -89,12 +89,12 @@ def sidebar():
             st.metric("Missing (%)", f"{percent_missing:.2f}%")
             st.metric("Duplicate Rows", df.duplicated().sum())
             st.write("**Numeric Summary:**")
-            st.write(df.describe())
+            st.dataframe(df.describe())
             st.write("**Non-Numeric Columns:**")
             non_numeric_cols = df.select_dtypes(exclude='number').columns
             if len(non_numeric_cols) > 0:
                 nunique = df[non_numeric_cols].nunique().to_frame("Unique Values")
-                st.write(nunique)
+                st.dataframe(nunique)
             else:
                 st.write("No non-numeric columns.")
 
@@ -107,4 +107,4 @@ def sidebar():
                 "api_key_info_shown"
             ]:
                 st.session_state.pop(k, None)
-            st.experimental_rerun()
+            st.rerun()
