@@ -3,7 +3,6 @@ streamlit
 
 # Data manipulation and analysis
 pandas
-tabular
 
 # Visualization
 plotly
