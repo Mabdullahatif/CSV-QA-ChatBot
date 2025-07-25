@@ -4,6 +4,15 @@
 
 CSV Q/A ChatBot is a web-based application that enables users to upload CSV files and interact with their data through a conversational chat interface. Powered by Streamlit for the frontend and LangChain for LLM orchestration, the app supports natural language queries, data analysis, and visualization using OpenAI, Google Gemini, or Groq LLMs. The chatbot can answer questions, generate data slices, and create interactive Plotly charts based on user prompts.
 
+## Demo Video
+
+
+
+https://github.com/user-attachments/assets/4c2773ea-9c8b-48a7-9b5c-a9c70b2b3d9a
+
+
+
+
 ---
 
 ## Directory Structure
@@ -94,7 +103,7 @@ TITANIC_PROJECT/
 - Install Python 3.10+ (recommended).
 - Clone the repository:
   ```bash
-  git clone <repo-url>
+  git clone https://github.com/Mabdullahatif/CSV-QA-ChatBot.git
   cd CSV-QA-ChatBot
   ```
 - Install dependencies:
@@ -179,11 +188,6 @@ UI (Answer/Plot)
 3. Ensure code is well-documented and tested.
 4. Submit a pull request describing your changes.
 
----
-
-## License
-
-MIT License (add LICENSE file if not present)
 
 ---
 
