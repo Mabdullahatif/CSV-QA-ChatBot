@@ -4,6 +4,11 @@
 
 CSV Q/A ChatBot is a web-based application that enables users to upload CSV files and interact with their data through a conversational chat interface. Powered by Streamlit for the frontend and LangChain for LLM orchestration, the app supports natural language queries, data analysis, and visualization using OpenAI, Google Gemini, or Groq LLMs. The chatbot can answer questions, generate data slices, and create interactive Plotly charts based on user prompts.
 
+
+## Architecture Diagram
+<img width="2239" height="633" alt="CSV-QA-ChatBot Architecture" src="https://github.com/user-attachments/assets/9f83734d-de4b-4576-8ff2-81652e9a53bb" />
+
+
 ## Demo Video
 
 
